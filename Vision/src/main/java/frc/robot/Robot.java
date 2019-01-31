@@ -75,7 +75,6 @@ public class Robot extends TimedRobot {
 
     
 
-    Mat frame = new Mat();
     visionThread = new VisionThread(cam0, new Pipeline(), pipeline->{
       if (!pipeline.filterContoursOutput().isEmpty()){
           Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));

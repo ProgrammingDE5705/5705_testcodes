@@ -27,19 +27,19 @@ public class Robot extends TimedRobot {
   private static final double kHoldDistance = 12.0;
 
   // factor to convert sensor values to a distance in inches
-  private static final double kValueToInches = 0.125;
+  private static final double kValueToInches = 0.125;  //1024
 
   // proportional speed constant
   private static final double kP = 0.05;
 
-  private static final int kLeftMotorPort = 0;
-  private static final int kRightMotorPort = 1;
-  private static final int kUltrasonicPort = 0;
+  //private static final int kLeftMotorPort = 0;
+  //private static final int kRightMotorPort = 1;
+  private static final int kUltrasonicPort = 3;
 
   private AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-  private DifferentialDrive m_robotDrive
-      = new DifferentialDrive(new Spark(kLeftMotorPort),
-      new Spark(kRightMotorPort));
+  //private DifferentialDrive m_robotDrive
+    //  = new DifferentialDrive(new Spark(kLeftMotorPort),
+      //new Spark(kRightMotorPort));
 
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
@@ -112,14 +112,15 @@ public class Robot extends TimedRobot {
 	 * Tells the robot to drive to a set distance (in inches) from an object
 	 * using proportional control.
 	 */
-    // sensor returns a value from 0-4095 that is scaled to inches
-		double currentDistance = m_ultrasonic.getValue() * kValueToInches;
+    // sensor returns a value from 0-4095 that is scaled to inches // 4.88mV por 5mm | 4095 = 5v
+    double currentDistance = m_ultrasonic.getValue() * kValueToInches; // 5000mV = 
 
 		// convert distance error to a motor speed
 		double currentSpeed = (kHoldDistance - currentDistance) * kP;
 
 		// drive robot
-		m_robotDrive.arcadeDrive(currentSpeed, 0);
+    //m_robotDrive.arcadeDrive(currentSpeed, 0);
+    SmartDashboard.putNumber("Distance", currentDistance);
   }
 
   /**
