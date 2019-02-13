@@ -8,7 +8,10 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -21,9 +24,10 @@ public class Robot extends TimedRobot {
 	private final Object imgLock = new Object();
 	/** Hardware */
 	// VictorSPX _vic = new VictorSPX(1);		// Follower MC, Could be a victor
-	TalonSRX _tal = new TalonSRX(01);		// Master MC, Talon SRX for Mag Encoder
+	WPI_TalonSRX _tal = new WPI_TalonSRX(2);		// Master MC, Talon SRX for Mag Encoder
+	Spark mot = new Spark(6);
 	Joystick _joystick = new Joystick(0);	// Joystick for project control
-
+	DifferentialDrive m = new DifferentialDrive(_tal, mot);
 	/* Simple thread to plot sensor velocity */
 	PlotThread _plotThread;
 
@@ -31,6 +35,7 @@ public class Robot extends TimedRobot {
 		/* Factory default hardware to prevent unexpected behavior */
 		// _vic.configFactoryDefault();
 		_tal.configFactoryDefault();
+		_tal.setInverted(true);
 
 		/* Victor will follow Talon */
 		//_vic.follow(_tal);
@@ -57,18 +62,41 @@ public class Robot extends TimedRobot {
 		 * 
 		 * This can also be wired to a gamepad to test velocity sweeping.
 		 */
-		if (_joystick.getRawButton(1))
-			_tal.set(ControlMode.PercentOutput, 0.25);	// 25% Output
-		else 
-	  _tal.set(ControlMode.PercentOutput, 0.0);	// 0% Output
-			double distance = 10000;	
-			double kProportional = 0.00035;
-			double SpeedY = ((distance - position)*kProportional);
-	  double position;
+		boolean bo = SmartDashboard.getBoolean("ResetEncoder", false);
+			  double distance = 9000;
+			  double kProportional = 0.0001;
+			  double SpeedY = -((distance - this.position)*kProportional);
+		if (_joystick.getRawButton(1)){
+			//public void resetEncoders() {
+				
+				System.out.println("Encoders reset!");
+				//}
+			}
+			else {
+				_tal.set(ControlMode.PercentOutput, 0.0);	// 0% Output
+			}
+			if (bo) {
+				_tal.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0); /* PIDLoop=0,timeoutMs=0 */
+				_tal.setSelectedSensorPosition(0, 0, 10);
+			}
+		SmartDashboard.putNumber("Speed", SpeedY);
 
-	  synchronized (imgLock){
-		  position = this.position;
-	  }
+		m.arcadeDrive(velocity(SpeedY, 0.7), 0);
+		
+		synchronized (imgLock){
+			position = this.position;
+		}
+	}
+	
+  public double velocity(double speed, double maxSpeed){
+	if (speed >= maxSpeed) speed = maxSpeed;
+	else if (speed <= -maxSpeed) speed = -maxSpeed;
+	return speed;
+  }
+
+  @Override
+  public void disabledPeriodic(){
+	  m.arcadeDrive(0, 0);
   }
 
 	/** 
@@ -98,7 +126,7 @@ public class Robot extends TimedRobot {
 				/* Grab the latest signal update from our 1ms frame update */
 				double velocity = this.robot._tal.getSelectedSensorVelocity(0);
 				synchronized (imgLock){
-				position = this.robot._tal.getSelectedSensorPosition(0);
+				position = -this.robot._tal.getSelectedSensorPosition(0);
 				}
 		
 			
