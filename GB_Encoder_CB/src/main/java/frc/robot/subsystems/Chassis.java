@@ -24,7 +24,8 @@ import frc.robot.commands.Drive;
 public class Chassis extends Subsystem {
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
-  WPI_TalonSRX _left = null;
+  //WPI_TalonSRX 
+  Spark _left = null;
   Spark _right = null;
 
   ADXRS450_Gyro _gyro = null;
@@ -32,17 +33,17 @@ public class Chassis extends Subsystem {
   DifferentialDrive m = null;
   
   public Chassis(){
-    _left = new WPI_TalonSRX(2);
-    _right = new Spark(6);
+    _left = new Spark(2);
+    _right = new Spark(3);
     _gyro = new ADXRS450_Gyro(Port.kOnboardCS0);
     m = new DifferentialDrive(_left, _right);
 
-    _left.setInverted(false);
+    /* _left.setInverted(false);
     _right.setInverted(true);
 
     _left.configFactoryDefault();
     _left.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 1);
-    _left.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    _left.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative); */
 
     _gyro.reset();
     _gyro.calibrate();
@@ -71,14 +72,14 @@ public class Chassis extends Subsystem {
     return _gyro.getAngle();
   }
 
-  public int position(){
+  /* public int position(){
     return _left.getSelectedSensorPosition(0);
   }
 
   public void resetEncoder(){
     _left.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 0); /* PIDLoop=0,timeoutMs=0 */
-		_left.setSelectedSensorPosition(0, 0, 10);
-  }
+//		_left.setSelectedSensorPosition(0, 0, 10);
+//}  
 
   public void resetGyro(){
     _gyro.reset();

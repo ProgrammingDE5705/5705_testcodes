@@ -27,7 +27,7 @@ public class DistanceAutonomous extends Command {
 
   @Override
   protected void initialize() {
-    Robot.chassis.resetEncoder();
+  //  Robot.chassis.resetEncoder();
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -49,7 +49,7 @@ public class DistanceAutonomous extends Command {
   @Override
   protected boolean isFinished() {
     angle = Robot.chassis.angleFinal();
-    position = Robot.chassis.position();
+    //position = Robot.chassis.position();
     return Math.abs(position) >= Math.abs(distance-110);
   }
 

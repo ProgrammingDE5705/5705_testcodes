@@ -27,9 +27,9 @@ public class Drive extends Command {
   protected void execute() {
     angle = Robot.chassis.angle();
 
-    double xSpeed = -Robot.m_oi.driverController.getRawAxis(0);
+    double xSpeed = Robot.m_oi.driverController.getRawAxis(1);
     double zSpeed = Robot.m_oi.driverController.getRawAxis(4);
-    Robot.chassis.arcadeDrive(xSpeed, zSpeed);
+    Robot.chassis.arcadeDrive(xSpeed*0.8, zSpeed*0.8);
   }
 
   // Make this return true when this Command no longer needs to run execute()
