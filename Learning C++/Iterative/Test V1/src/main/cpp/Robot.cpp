@@ -1,69 +1,70 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Robot.h"
-
 #include <iostream>
+#include <string>
+#include <Robot_K.h>
+// #include <frc/WPILib.h>  // uncomment to include everything
 
-#include <frc/smartdashboard/SmartDashboard.h>
+#include "frc/drive/DifferentialDrive.h"
+#include "frc/TimedRobot.h"
+#include "frc/Joystick.h"
+#include "ctre/Phoenix.h"
 
-void Robot::RobotInit() {
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
-}
+using namespace frc;
+using namespace DriveK;
 
-/**
- * This function is called every robot packet, no matter the mode. Use
- * this for items like diagnostics that you want ran during disabled,
- * autonomous, teleoperated and test.
- *
- * <p> This runs after the mode specific periodic functions, but before
- * LiveWindow and SmartDashboard integrated updating.
- */
-void Robot::RobotPeriodic() {}
+class Robot: public TimedRobot {
+public:
+	/* ------ Update CAN ID's Where necessary ------*/
 
-/**
- * This autonomous (along with the chooser code above) shows how to select
- * between different autonomous modes using the dashboard. The sendable chooser
- * code works with the Java SmartDashboard. If you prefer the LabVIEW Dashboard,
- * remove all of the chooser code and uncomment the GetString line to get the
- * auto name from the text box below the Gyro.
- *
- * You can add additional auto modes by adding additional comparisons to the
- * if-else structure below with additional strings. If using the SendableChooser
- * make sure to add them to the chooser code above as well.
- */
-void Robot::AutonomousInit() {
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
-  std::cout << "Auto selected: " << m_autoSelected << std::endl;
+	WPI_VictorSPX * RightMaster = new WPI_VictorSPX(FrontRight);
+	WPI_VictorSPX * RightFollower = new WPI_VictorSPX(BackRight);
+	WPI_VictorSPX * LeftMaster = new WPI_VictorSPX(FrontLeft);
+	WPI_VictorSPX * LeftFollower = new WPI_VictorSPX(BackLeft);
 
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
-}
+	DifferentialDrive * Chassis = new DifferentialDrive(*LeftMaster, *RightMaster);
 
-void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
-}
+	Joystick * HMController = new Joystick(0);
 
-void Robot::TeleopInit() {}
+	void RobotInit() {
+		/* Factory default values */
+		RightMaster->ConfigFactoryDefault();
+		RightFollower->ConfigFactoryDefault();
+		LeftMaster->ConfigFactoryDefault();
+		LeftFollower->ConfigFactoryDefault();
 
-void Robot::TeleopPeriodic() {}
+		/* Set up followers */
+		RightFollower->Follow(*RightMaster);
+		LeftFollower->Follow(*LeftMaster);
 
-void Robot::TestPeriodic() {}
+		/* Set rotation clockwise or counter-clockwise according to your cable management*/
+		RightMaster->SetInverted(false);
+		RightFollower->SetInverted(false);
+		LeftMaster->SetInverted(false);
+		LeftFollower->SetInverted(false);
+
+
+		Chassis->SetRightSideInverted(false);
+	}
+
+	void TeleopPeriodic() { //Function where the robot is operated by some kid
+
+		std::stringstream work;
+		/* Get controller stick's values */
+		double Forward = -1 * HMController->GetRawAxis(1); /* positive is Forwardard */
+		double Rotation = +1 * HMController->GetRawAxis(4); /* positive is right */
+
+		/* Drive robot */
+		Chassis->ArcadeDrive(Forward, Rotation, false);	
+	}
+  
+private:
+};
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
