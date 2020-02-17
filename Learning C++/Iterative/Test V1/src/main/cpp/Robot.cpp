@@ -14,7 +14,8 @@
 #include "frc/TimedRobot.h"
 #include "frc/Joystick.h"
 #include "ctre/Phoenix.h"
-
+//#include <Victor.h>
+//#include <VictorSP.h>
 using namespace frc;
 using namespace DriveK;
 
@@ -43,10 +44,10 @@ public:
 		LeftFollower->Follow(*LeftMaster);
 
 		/* Set rotation clockwise or counter-clockwise according to your cable management*/
-		RightMaster->SetInverted(false);
-		RightFollower->SetInverted(false);
-		LeftMaster->SetInverted(false);
-		LeftFollower->SetInverted(false);
+		RightMaster->SetInverted(FRightB);
+		RightFollower->SetInverted(BRightB);
+		LeftMaster->SetInverted(FLeftB);
+		LeftFollower->SetInverted(BLeftB);
 
 
 		Chassis->SetRightSideInverted(false);
@@ -62,7 +63,7 @@ public:
 		/* Drive robot */
 		Chassis->ArcadeDrive(Forward, Rotation, false);	
 	}
-  
+
 private:
 };
 
