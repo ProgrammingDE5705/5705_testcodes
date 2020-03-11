@@ -131,8 +131,49 @@ void Robot::TestInit() {}
 
 void Robot::TestPeriodic() {}
 
+  WPI_VictorSPX RightMaster {FrontRight};
+  WPI_VictorSPX RightFollower {BackRight};
+  WPI_VictorSPX LeftMaster {FrontLeft};
+  WPI_VictorSPX LeftFollower {BackLeft};
+  frc::DifferentialDrive Chassis{RightMaster, LeftMaster};
+	//frc::DifferentialDrive * Chassis = new DifferentialDrive(*LeftMaster, *RightMaster);
+  
+  frc::VictorSP Feeder{0};
+  frc::VictorSP Shooter{1};
+  frc::Victor   Banda{2};
+
+  frc::DoubleSolenoid baseA{0, bA1, bA2};
+  frc::DoubleSolenoid baseB{0, bB1, bB2};
+
+  frc::DoubleSolenoid topeA{0, tA1, tA2};
+  frc::DoubleSolenoid topeB{0, tB1, tB2};
+  frc::DoubleSolenoid Intaker{1, 0, 1};
+  
+  frc::Compressor *COMPER;
+  //m_Compressor = new frc::Compressor(1);
+
+
+  frc::VictorSP Feeder{0};
+  frc::VictorSP Shooter{1};
+  frc::Victor   Banda{2};
+
+	frc::Joystick HMController{0};
+  frc::Joystick TController{1};
 
   
+		/* Get controller stick's values */
+		double Forward = -1 * HMController.GetRawAxis(1); /* positive is Forwardard */
+		double Rotation = 1 * HMController.GetRawAxis(2); /* positive is right */
+    bool Shoot = TController.GetRawButton(1);
+    bool Transport = TController.GetRawButton(2);
+    bool Feed = TController.GetRawButton(6);
+    //
+    bool upBase = HMController.GetRawButtonPressed(3);        // B
+    bool downBase = HMController.GetRawButtonPressed(4);      // 
+    bool upTope = HMController.GetRawButtonPressed(1);        //
+    bool downTope = HMController.GetRawButtonPressed(2);      //
+    bool COMPEROn = HMController.GetRawButtonPressed(5);  //
+    bool COMPEROff = HMController.GetRawButtonPressed(6); //
     
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
