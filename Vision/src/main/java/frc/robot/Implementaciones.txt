@@ -1,0 +1,37 @@
+|===============================|
+|    #! Variables a utilizar    |
+|-------------------------------|
+|  VisionThread visionThread;   |
+|  UsbCamera source;            |
+|	 CvSink sink;                 |
+|	 CvSource output;             |
+|	 Mat mat;                     |
+|===============================|
+
+|==========================================================================================|
+|                           Código a implementar en robotIinit()                           |
+|------------------------------------------------------------------------------------------|
+|		                                                                                       |
+|		source = CameraServer.getInstance().startAutomaticCapture();                           |
+|		source.setExposureManual(20);                                                          |
+|		source.setResolution(640, 480);                                                        |
+|		                                                                                       |
+|		sink = CameraServer.getInstance().getVideo();                                          |
+|		                                                                                       |
+|		output = CameraServer.getInstance().putVideo("Processed: ", 640, 480);                 |
+|		                                                                                       |
+|		visionThread = new VisionThread(source, new VisionImplementation(), pipeline -> {      |
+|			sink.grabFrame(mat);                                                                 |
+|			pipeline.process(mat);                                                               |
+|			                                                                                     |
+|			output.putFrame(pipeline.getImgae());                                                |
+|		});                                                                                    |
+|	                                                                                         |
+|                                                                                          |
+|==========================================================================================|
+
+|===================================|
+|   código en autonomosPeriodic()   |
+|-----------------------------------|
+|     visionThread.start();         |
+|===================================|
